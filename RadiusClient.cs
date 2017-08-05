@@ -2,19 +2,24 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Flexinets.Radius
 {
     public class RadiusClient
     {
-        private readonly UdpClient _udpClient;
+        private readonly IPEndPoint _localEndpoint;
         private readonly RadiusDictionary _dictionary;
 
+
+        /// <summary>
+        /// Create a radius client which sends and receives responses on localEndpoint
+        /// </summary>
+        /// <param name="localEndpoint"></param>
+        /// <param name="dictionary"></param>
         public RadiusClient(IPEndPoint localEndpoint, RadiusDictionary dictionary)
         {
-            _udpClient = new UdpClient(localEndpoint);
+            _localEndpoint = localEndpoint;
             _dictionary = dictionary;
         }
 
@@ -29,16 +34,20 @@ namespace Flexinets.Radius
         public async Task<IRadiusPacket> SendPacketAsync(IRadiusPacket packet, IPEndPoint remoteEndpoint, TimeSpan timeout)
         {
             var packetBytes = packet.GetBytes(_dictionary);
-
-            await _udpClient.SendAsync(packetBytes, packetBytes.Length, remoteEndpoint);
-            Task.Run(() =>
+            using (var udpClient = new UdpClient(_localEndpoint))
             {
-                Thread.Sleep(timeout);
-                _udpClient?.Close();
-            });
-            // todo use events to create a common udpclient for multiple packets to enable sending and receiving without blocking
-            var response = await _udpClient.ReceiveAsync();
-            return RadiusPacket.Parse(response.Buffer, _dictionary, packet.SharedSecret);
+                await udpClient.SendAsync(packetBytes, packetBytes.Length, remoteEndpoint);
+
+                // todo use events to create a common udpclient for multiple packets to enable sending and receiving without blocking
+                var responseTask = udpClient.ReceiveAsync();
+
+                var completedTask = await Task.WhenAny(responseTask, Task.Delay(timeout));
+                if (completedTask == responseTask)
+                {
+                    return RadiusPacket.Parse(responseTask.Result.Buffer, _dictionary, packet.SharedSecret);
+                }                
+                throw new TaskCanceledException($"Receive timed out after {timeout}");
+            }
         }
 
 
