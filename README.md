@@ -16,4 +16,6 @@ if (responsePacket.Code == PacketCode.AccessAccept)
 }
 ```
 
-Multiple requests and responses can be made asynchronously on the same local port as long as the identifier and remote host:port remain unique
+Multiple requests and responses can be made asynchronously on the same local port as long as the identifier and remote host:port remain unique  
+
+https://www.nuget.org/packages/Flexinets.Radius.RadiusClient/
