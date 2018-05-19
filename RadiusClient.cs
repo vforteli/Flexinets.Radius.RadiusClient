@@ -11,7 +11,7 @@ namespace Flexinets.Radius
     {
         private readonly IPEndPoint _localEndpoint;
         private readonly UdpClient _udpClient;
-        private readonly RadiusDictionary _dictionary;
+        private readonly IRadiusDictionary _dictionary;
         private readonly ConcurrentDictionary<(Byte identifier, IPEndPoint remoteEndpoint), TaskCompletionSource<UdpReceiveResult>> _pendingRequests = new ConcurrentDictionary<(Byte, IPEndPoint), TaskCompletionSource<UdpReceiveResult>>();
 
 
@@ -20,7 +20,7 @@ namespace Flexinets.Radius
         /// </summary>
         /// <param name="localEndpoint"></param>
         /// <param name="dictionary"></param>
-        public RadiusClient(IPEndPoint localEndpoint, RadiusDictionary dictionary)
+        public RadiusClient(IPEndPoint localEndpoint, IRadiusDictionary dictionary)
         {
             _localEndpoint = localEndpoint;
             _dictionary = dictionary;

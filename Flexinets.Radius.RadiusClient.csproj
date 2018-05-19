@@ -1,20 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net47</TargetFrameworks>
-    <Version>1.3.0.4</Version>
+    <Version>1.4.0</Version>
     <Authors>Verner Fortelius</Authors>
     <Description>Radius client. Send packets to radius servers. Packets can be sent asynchronously and are mapped to response using remote endpoint and identifier</Description>
     <Copyright>Copyright 2017 Verner Fortelius</Copyright>
     <PackageLicenseUrl>https://github.com/vforteli/Flexinets.Radius.RadiusClient/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/vforteli/Flexinets.Radius.RadiusClient</PackageProjectUrl>
-    <PackageReleaseNotes>Bump reference and version</PackageReleaseNotes>
-    <AssemblyVersion>1.3.0.4</AssemblyVersion>
-    <FileVersion>1.3.0.4</FileVersion>
+    <PackageReleaseNotes>Use IRadiusDictionary</PackageReleaseNotes>
+    <AssemblyVersion>1.4.0</AssemblyVersion>
+    <FileVersion>1.4.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Flexinets.Radius.Core" Version="1.3.0.4" />
+    <PackageReference Include="Flexinets.Radius.Core" Version="1.4.0" />
   </ItemGroup>
 
 </Project>
