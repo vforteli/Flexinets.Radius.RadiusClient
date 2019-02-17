@@ -1,4 +1,8 @@
-# RadiusClient usage    
+# Radius client library for .NET Standard
+
+This library can be used to asynchronously send packets to Radius servers
+
+## RadiusClient usage    
 ```
 var dictionary = new RadiusDictionary(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\radius.dictionary");
 var radiusPacketParser = new RadiusPacketParser(NullLogger<RadiusPacketParser>.Instance, dictionary)
