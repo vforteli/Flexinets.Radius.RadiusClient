@@ -1,7 +1,8 @@
 # RadiusClient usage    
 ```
 var dictionary = new RadiusDictionary(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\radius.dictionary");
-var client = new RadiusClient(new IPEndPoint(IPAddress.Any, 1824), dictionary);
+var radiusPacketParser = new RadiusPacketParser(NullLogger<RadiusPacketParser>.Instance, dictionary)
+var client = new RadiusClient(new IPEndPoint(IPAddress.Any, 1824), radiusPacketParser);
 
 var packet = new RadiusPacket(PacketCode.AccessRequest, 0, "xyzzy5461");
 packet.AddAttribute("User-Name", "nemo");

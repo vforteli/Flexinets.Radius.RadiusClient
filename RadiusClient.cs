@@ -11,7 +11,7 @@ namespace Flexinets.Radius
     {
         private readonly IPEndPoint _localEndpoint;
         private readonly UdpClient _udpClient;
-        private readonly IRadiusDictionary _dictionary;
+        private readonly IRadiusPacketParser _radiusPacketParser;
         private readonly ConcurrentDictionary<(Byte identifier, IPEndPoint remoteEndpoint), TaskCompletionSource<UdpReceiveResult>> _pendingRequests = new ConcurrentDictionary<(Byte, IPEndPoint), TaskCompletionSource<UdpReceiveResult>>();
 
 
@@ -20,10 +20,10 @@ namespace Flexinets.Radius
         /// </summary>
         /// <param name="localEndpoint"></param>
         /// <param name="dictionary"></param>
-        public RadiusClient(IPEndPoint localEndpoint, IRadiusDictionary dictionary)
+        public RadiusClient(IPEndPoint localEndpoint, IRadiusPacketParser radiusPacketParser)
         {
             _localEndpoint = localEndpoint;
-            _dictionary = dictionary;
+            _radiusPacketParser = radiusPacketParser;
             _udpClient = new UdpClient(_localEndpoint);
             var receiveTask = StartReceiveLoopAsync();
         }
@@ -38,7 +38,7 @@ namespace Flexinets.Radius
         /// <returns></returns>
         public async Task<IRadiusPacket> SendPacketAsync(IRadiusPacket packet, IPEndPoint remoteEndpoint, TimeSpan timeout)
         {
-            var packetBytes = packet.GetBytes(_dictionary);            
+            var packetBytes = _radiusPacketParser.GetBytes(packet);
             var responseTaskCS = new TaskCompletionSource<UdpReceiveResult>();
             if (_pendingRequests.TryAdd((packet.Identifier, remoteEndpoint), responseTaskCS))
             {
@@ -46,7 +46,7 @@ namespace Flexinets.Radius
                 var completedTask = await Task.WhenAny(responseTaskCS.Task, Task.Delay(timeout));
                 if (completedTask == responseTaskCS.Task)
                 {
-                    return RadiusPacket.Parse(responseTaskCS.Task.Result.Buffer, _dictionary, packet.SharedSecret);
+                    return _radiusPacketParser.Parse(responseTaskCS.Task.Result.Buffer, packet.SharedSecret);
                 }
                 throw new InvalidOperationException($"Receive response for id {packet.Identifier} timed out after {timeout}");
             }
@@ -89,7 +89,7 @@ namespace Flexinets.Radius
 
         public void Dispose()
         {
-            _udpClient?.Dispose();            
+            _udpClient?.Dispose();
         }
     }
 }
