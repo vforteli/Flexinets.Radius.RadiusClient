@@ -82,7 +82,11 @@ namespace Flexinets.Radius
                         taskCS.SetResult(response);
                     }
                 }
-                catch (ObjectDisposedException) { } // This is thrown when udpclient is disposed, can be safely ignored
+                catch (ObjectDisposedException)
+                {
+                    // This is thrown when udpclient is disposed, can be safely ignored
+                    return;
+                }
             }
         }
 
