@@ -48,6 +48,10 @@ namespace Flexinets.Radius
                 {
                     return _radiusPacketParser.Parse(responseTaskCS.Task.Result.Buffer, packet.SharedSecret);
                 }
+                if (_pendingRequests.TryRemove((packet.Identifier, remoteEndpoint), out var taskCS))
+                {
+                    taskCS.SetCanceled();
+                }
                 throw new InvalidOperationException($"Receive response for id {packet.Identifier} timed out after {timeout}");
             }
             throw new InvalidOperationException($"There is already a pending receive with id {packet.Identifier}");
