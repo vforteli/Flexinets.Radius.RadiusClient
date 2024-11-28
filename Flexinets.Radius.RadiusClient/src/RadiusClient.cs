@@ -12,7 +12,7 @@ namespace Flexinets.Radius
     {
         private readonly IRadiusPacketParser _radiusPacketParser;
         private readonly UdpClient _udpClient;
-        private Task? _receiveLoopTask;
+        private Task _receiveLoopTask;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         private readonly
@@ -46,11 +46,15 @@ namespace Flexinets.Radius
             TimeSpan timeout)
         {
             // Start a receive loop before sending packet if one isnt already running to ensure we can receive the response
-            _receiveLoopTask ??= Task.Factory.StartNew(
-                StartReceiveLoopAsync,
-                _cancellationTokenSource.Token,
-                TaskCreationOptions.LongRunning,
-                TaskScheduler.Default);
+            if (_receiveLoopTask != null)
+            {
+                _receiveLoopTask = Task.Factory.StartNew(
+                    StartReceiveLoopAsync,
+                    _cancellationTokenSource.Token,
+                    TaskCreationOptions.LongRunning,
+                    TaskScheduler.Default);
+            }
+
 
             var completionSource = new TaskCompletionSource<UdpReceiveResult>();
 
